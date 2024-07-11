@@ -1,6 +1,5 @@
-import React from "react";
-import { Copy } from "lucide-react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -12,28 +11,21 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-
-import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
+import Popup from "./Popup";
 
 function RegisterForm() {
+  const [open, setOpen] = useState(false);
+  const handleClick = async (e) => {
+    e.preventDefault();
+    setOpen(true);
+    console.log(open);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   return (
-    <form>
+    <form onSubmit={handleClick}>
       <Card>
         <CardHeader className="pb-3">
           <CardTitle>Register</CardTitle>
@@ -44,11 +36,21 @@ function RegisterForm() {
         <CardContent className="space-y-2">
           <div className="space-y-1">
             <Label htmlFor="name">Name</Label>
-            <Input id="name" type="text" placeholder="Aditya Keshari" />
+            <Input
+              id="name"
+              type="text"
+              placeholder="Aditya Keshari"
+              autoComplete="off"
+            />
           </div>
           <div className="space-y-1">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="aditya@gmail.com" />
+            <Input
+              id="email"
+              type="email"
+              placeholder="aditya@gmail.com"
+              autoComplete="off"
+            />
           </div>
           <div className="space-y-1">
             <Label htmlFor="password">Password</Label>
@@ -63,43 +65,14 @@ function RegisterForm() {
             <Input
               id="username"
               type="text"
-              placeholder="enter available username"
+              placeholder="enter available username "
+              autoComplete="off"
             />
           </div>
         </CardContent>
         <CardFooter className=" flex items-center justify-center ">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button>Send OTP</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>One Time Password</DialogTitle>
-                <DialogDescription>
-                  Enter otp for email verification.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="flex items-center space-x-2">
-                <InputOTP maxLength={6} pattern={REGEXP_ONLY_DIGITS_AND_CHARS}>
-                  <InputOTPGroup>
-                    <InputOTPSlot index={0} />
-                    <InputOTPSlot index={1} />
-                    <InputOTPSlot index={2} />
-                    <InputOTPSlot index={3} />
-                    <InputOTPSlot index={4} />
-                    <InputOTPSlot index={5} />
-                  </InputOTPGroup>
-                </InputOTP>
-              </div>
-              <DialogFooter className="sm:justify-start">
-                <DialogClose asChild>
-                  <Button type="button" variant="secondary">
-                    Close
-                  </Button>
-                </DialogClose>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <Button type="submit">Send OTP</Button>
+          <Popup open={open} handleClose={handleClose} />
         </CardFooter>
       </Card>
     </form>
