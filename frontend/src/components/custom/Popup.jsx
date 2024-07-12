@@ -18,9 +18,6 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 function Popup({ open, handleClose }) {
-  {
-    console.log(open);
-  }
   return (
     <div>
       <Dialog open={open} onOpenChange={handleClose}>
