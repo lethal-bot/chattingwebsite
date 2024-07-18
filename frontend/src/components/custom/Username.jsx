@@ -2,20 +2,19 @@ import React, { useEffect, useState } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { userNameValidation } from "../helpers/validators";
+import { validUsername } from "@/lib/api";
 function Username({ setChange }) {
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [timeoutId, setTimeoutId] = useState(null);
 
-  function delay(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
   useEffect(() => {
+    setLoading(true);
     if (username === "") {
       setChange("");
       setError("");
+      setLoading(false);
       return;
     }
 
@@ -23,6 +22,7 @@ function Username({ setChange }) {
     if (invalidUserName) {
       setChange("");
       setError(invalidUserName);
+      setLoading(false);
       return;
     }
     setError("");
@@ -32,17 +32,16 @@ function Username({ setChange }) {
 
     const newTimeoutId = setTimeout(async () => {
       try {
-        setLoading(true);
         setChange("");
         // Simulate async operation
-        await delay(800);
-        // Here you can add the logic to validate the username
+        const res = await fetch(validUsername + "/" + username);
+        if (!res.ok) throw new Error("username already taken");
         setLoading(false);
         setChange(username);
         setError("");
       } catch (e) {
         setLoading(false);
-        setError("");
+        setError(e.message);
         setChange("");
       }
     }, 800);
@@ -66,6 +65,7 @@ function Username({ setChange }) {
         type="text"
         placeholder="enter unique username "
         autoComplete="off"
+        spellCheck="false"
         name="username"
         className={"focus-visible:ring-1 focus-visible:ring-offset-0"}
         maxLength="30"
@@ -73,6 +73,9 @@ function Username({ setChange }) {
       />
       {loading && <p className="text-slate-400 text-sm p-0">checkingg..</p>}
       {error && <p className="error">{error}</p>}
+      {username && !loading && !error && (
+        <p className="valid">valid username ✅</p>
+      )}
     </div>
   );
 }

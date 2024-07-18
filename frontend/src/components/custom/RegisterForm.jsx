@@ -15,10 +15,19 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
+
+//custom components
 import Popup from "./Popup";
 import Username from "./Username";
 
+//custom hooks
+import usePasswordToggle from "@/customhooks/usePasswordToggle";
+
+//urls
+import { register, sendOtp } from "@/lib/api";
+
 function RegisterForm() {
+  const [PasswordInputType, ToggleIcon] = usePasswordToggle();
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState({
     name: "",
@@ -27,12 +36,14 @@ function RegisterForm() {
     nameError: "",
     emailError: "",
     passwordError: "",
-    username: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   function handleChange(e, inputFieldName) {
+    setError("");
     if (inputFieldName == "name") {
       const value = e.target.value.trim();
-      console.log(value);
+
       const temp = nameValidation(value);
       if (temp)
         setInput((input) => ({ ...input, name: value, nameError: temp }));
@@ -44,7 +55,7 @@ function RegisterForm() {
         setInput((input) => ({ ...input, emailError: "" }));
         return;
       }
-      console.log(value);
+
       const temp = emailValidation(value);
       if (temp)
         setInput((input) => ({ ...input, email: value, emailError: temp }));
@@ -56,7 +67,7 @@ function RegisterForm() {
         setInput((input) => ({ ...input, passwordError: "" }));
         return;
       }
-      console.log(value);
+
       const temp = passwordValidation(value);
       if (temp)
         setInput((input) => ({
@@ -69,13 +80,62 @@ function RegisterForm() {
     }
   }
 
-  function handleUsernameChange(value) {
-    setInput((input) => ({ ...input, username: value }));
+  // function handleUsernameChange(value) {
+  //   setInput((input) => ({ ...input, username: value }));
+  // }
+
+  async function sendingOtp(email) {
+    try {
+      const res = await fetch(sendOtp + "/" + email);
+      if (!res.ok) return false;
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
-  const handleClick = async (e) => {
+
+  const handleSubmit = async (e) => {
+    setError("");
+    setLoading(true);
     e.preventDefault();
-    setOpen(true);
-    console.log(open);
+    if (
+      input.nameError ||
+      input.passwordError ||
+      input.emailError ||
+      !input.name ||
+      !input.password ||
+      !input.email
+    ) {
+      setError("invalid input");
+      setLoading(false);
+      return;
+    }
+    try {
+      const res = await fetch(register, {
+        method: "POST",
+        body: JSON.stringify({
+          name: input.name,
+          email: input.email,
+          password: input.password,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log(res);
+      if (!res.ok) throw new Error("already registered");
+      const result = await res.json();
+      console.log(result);
+      const otpSent = sendingOtp(input.email);
+      if (otpSent) {
+        setOpen(true);
+      } else setError("error occured");
+    } catch (e) {
+      setError(e.message);
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
   };
   const handleClose = () => {
     setOpen(false);
@@ -121,25 +181,41 @@ function RegisterForm() {
         </div>
         <div className="space-y-1">
           <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            type="password"
-            placeholder="enter a password"
-            name="password"
-            maxLength="40"
-            // value={input.password}
-            onChange={(e) => handleChange(e, "password")}
-            className={"focus-visible:ring-1 focus-visible:ring-offset-0"}
-          />
+          <div className=" w-[100%] relative">
+            <Input
+              id="password"
+              type={PasswordInputType}
+              placeholder="enter a password"
+              name="password"
+              maxLength="30"
+              onChange={(e) => handleChange(e, "password")}
+              className={"focus-visible:ring-1 focus-visible:ring-offset-0"}
+            />
+            <span className="absolute top-[33%] right-[5%] z-10 cursor-pointer">
+              {ToggleIcon}
+            </span>
+          </div>
           {input.passwordError && (
             <p className="error">{input.passwordError}</p>
           )}
         </div>
-        <Username setChange={handleUsernameChange} />
+
+        {/* <Username setChange={handleUsernameChange} /> */}
       </CardContent>
-      <CardFooter className=" flex items-center justify-center pb-5">
-        <Button type="button">Send OTP</Button>
-        <Popup open={open} handleClose={handleClose} />
+      <CardFooter className=" flex items-center justify-center flex-col pb-5">
+        {!loading && (
+          <Button type="button" onClick={handleSubmit}>
+            Send OTP
+          </Button>
+        )}
+        {loading && (
+          <Button type="button" disabled>
+            Sending...
+          </Button>
+        )}
+        {error && <p className="error">{error}</p>}
+        <Popup open={open} handleClose={handleClose} email={input.email} />
+        {/* <Popup open={true} handleClose={handleClose} /> */}
       </CardFooter>
     </Card>
   );

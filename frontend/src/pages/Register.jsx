@@ -12,7 +12,7 @@ function Register() {
   const [data, setData] = useState({});
 
   return (
-    <div className="container mt-3 mx-auto max-w-[500px] flex items-center justify-center flex-col">
+    <div className="container mt-20 mx-auto max-w-[500px] flex items-center justify-center flex-col">
       <Tabs defaultValue="login" className="w-[100%] ">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="login">Login</TabsTrigger>

@@ -1,7 +1,7 @@
 export function userNameValidation(name) {
     if (name.length < 6) return "username length must be greater than 6";
     for (let i = 0; i < name.length; i++) {
-        if (!((name[i] >= 'a' && name.at(i) <= 'z') || (name[i] >= 'a' && name.at(i) <= 'z') || (name[i] >= '0' && name.at(i) <= '9') || name[i] == '_')) return "only alphabets, numbers and _ allowed";
+        if (!((name[i] >= 'a' && name[i] <= 'z') || (name[i] >= 'A' && name[i] <= 'Z') || (name[i] >= '0' && name.at(i) <= '9') || name[i] == '_')) return "only alphabets, numbers and _ allowed";
 
     }
 }
@@ -9,7 +9,7 @@ export function userNameValidation(name) {
 export function nameValidation(name) {
     let count = 0;
     for (let i = 0; i < name.length; i++) {
-        if (!((name[i] >= 'a' && name.at(i) <= 'z') || (name[i] >= 'a' && name.at(i) <= 'z') || name[i] == ' ')) return "only alphabets and space allowed";
+        if (!((name[i] >= 'a' && name[i] <= 'z') || (name[i] >= 'A' && name[i] <= 'Z') || name[i] == ' ')) return "only alphabets and space allowed";
         if (name[i] === ' ') count++;
     }
     if (count > 1) return "format must be FIRSTNAME LASTNAME"

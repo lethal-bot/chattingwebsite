@@ -20,11 +20,11 @@ const userSchema = mongoose.Schema({
         trim: true,
         required: true
     },
-    username: {
-        type: String,
-        required: true,
-        unique: true
-    },
+    // username: {
+    //     type: String,
+    //     required: true,
+    //     unique: true
+    // },
     isVerified: {
         type: Boolean,
         default: false
