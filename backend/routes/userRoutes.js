@@ -117,4 +117,17 @@ router.get('/users/logoutAll', auth, async (req, res) => {
     }
 })
 
+//searching route
+router.get('/user', auth, async (req, res) => {
+    const keyword = req.query.search ? {
+        $or: [
+            { name: { $regex: req.query.search, $options: "i" } },
+            { email: { $regex: req.query.search, $options: "i" } }
+        ]
+    } : {};
+
+    const users = await User.find(keyword).find({ id: { $ne: req.user._id } });
+    res.send(users);
+})
+
 module.exports = router;
